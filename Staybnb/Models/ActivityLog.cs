@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Staybnb.Models;
+
+namespace Staybnb.Models;
 
 public class ActivityLog
 {

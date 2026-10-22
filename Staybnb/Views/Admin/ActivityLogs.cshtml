@@ -1,0 +1,35 @@
+﻿@model List<Staybnb.Models.ActivityLog>
+@{
+    ViewData["Title"] = "Activity Logs";
+    var selected = ViewBag.SelectedType as Staybnb.Models.ActivityType?;
+}
+
+<h1>Activity Logs</h1>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <select name="type" class="form-select" onchange="this.form.submit()">
+            <option value="">All types</option>
+            @foreach (var t in Enum.GetValues<Staybnb.Models.ActivityType>())
+            {
+                <option value="@t" selected="@(selected == t)">@t</option>
+            }
+        </select>
+    </div>
+</form>
+
+<table class="table table-sm align-middle">
+    <thead><tr><th>Date (UTC)</th><th>User</th><th>Action</th><th>Type</th></tr></thead>
+    <tbody>
+        @foreach (var l in Model)
+        {
+            <tr>
+                <td>@l.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@(l.User != null ? $"{l.User.FirstName} {l.User.LastName}" : "System")</td>
+                <td>@l.Action</td>
+                <td>@l.ActivityType</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<p class="text-muted">Showing the latest 200 entries.</p>

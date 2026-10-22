@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Staybnb.Data;
 using Staybnb.Models;
+using Staybnb.ViewModels;
 using Staybnb.Services;
 
 namespace Staybnb.Controllers;
@@ -117,5 +118,89 @@ public class AdminController : Controller
 
         TempData["Success"] = "Application rejected.";
         return RedirectToAction(nameof(HostRequests));
+    }
+
+    // ---------- User management (SuperAdmin only) ----------
+
+    [Authorize(Roles = "SuperAdmin")]
+    public async Task<IActionResult> Users(string? search)
+    {
+        var query = _db.Users.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(u => u.Email!.Contains(search)
+                                  || u.FirstName.Contains(search)
+                                  || u.LastName.Contains(search));
+        }
+
+        var users = await query.OrderBy(u => u.Email).ToListAsync();
+
+        var rows = new List<UserRowViewModel>();
+        foreach (var u in users)
+        {
+            rows.Add(new UserRowViewModel
+            {
+                Id = u.Id,
+                Name = $"{u.FirstName} {u.LastName}",
+                Email = u.Email ?? "",
+                Roles = (await _userManager.GetRolesAsync(u)).ToList()
+            });
+        }
+
+        ViewBag.Search = search;
+        return View(rows);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    [Authorize(Roles = "SuperAdmin")]
+    public async Task<IActionResult> PromoteToAdmin(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return NotFound();
+
+        // Only Guests can be promoted
+        if (!await _userManager.IsInRoleAsync(user, "Guest"))
+        {
+            TempData["Error"] = "Only users with the Guest role can be promoted to Admin.";
+            return RedirectToAction(nameof(Users));
+        }
+
+        var added = await _userManager.AddToRoleAsync(user, "Admin");
+        if (!added.Succeeded)
+        {
+            TempData["Error"] = "Could not add the Admin role.";
+            return RedirectToAction(nameof(Users));
+        }
+
+        await _userManager.RemoveFromRoleAsync(user, "Guest");
+        await _userManager.UpdateSecurityStampAsync(user);
+
+        var actorId = _userManager.GetUserId(User);
+        await _activityLogger.LogAsync(actorId, $"Promoted {user.Email} to Admin", ActivityType.RoleChange);
+        await _notifications.NotifyAsync(user.Id, "You are now an Admin",
+            "A SuperAdmin has promoted your account to Admin. Log in again to see the Admin Dashboard.",
+            NotificationType.General);
+
+        TempData["Success"] = $"{user.Email} is now an Admin.";
+        return RedirectToAction(nameof(Users));
+    }
+
+    // ---------- Activity log ----------
+
+    public async Task<IActionResult> ActivityLogs(ActivityType? type)
+    {
+        var query = _db.ActivityLogs.Include(l => l.User).AsQueryable();
+
+        if (type.HasValue)
+            query = query.Where(l => l.ActivityType == type.Value);
+
+        var logs = await query
+            .OrderByDescending(l => l.CreatedAt)
+            .Take(200)
+            .ToListAsync();
+
+        ViewBag.SelectedType = type;
+        return View(logs);
     }
 }

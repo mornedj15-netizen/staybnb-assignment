@@ -1,0 +1,44 @@
+﻿@model List<Staybnb.ViewModels.UserRowViewModel>
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<h1>User Management</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Search by name or email" />
+    </div>
+    <div class="col-auto"><button type="submit" class="btn btn-primary">Search</button></div>
+</form>
+
+<table class="table align-middle">
+    <thead><tr><th>Name</th><th>Email</th><th>Roles</th><th></th></tr></thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.Name</td>
+                <td>@u.Email</td>
+                <td>@string.Join(", ", u.Roles)</td>
+                <td>
+                    @if (u.Roles.Contains("Guest"))
+                    {
+                        <form asp-action="PromoteToAdmin" asp-route-id="@u.Id" method="post">
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Promote to Admin</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
