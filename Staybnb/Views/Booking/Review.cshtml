@@ -1,0 +1,29 @@
+﻿@model Staybnb.ViewModels.BookingSummaryViewModel
+@{
+    ViewData["Title"] = "Review your booking";
+}
+
+<h1>Review your booking</h1>
+<div class="row">
+    <div class="col-md-6">
+        <h4>@Model.Property.Title</h4>
+        <p class="text-muted">@Model.Property.City</p>
+        <p>@Model.CheckIn.ToString("yyyy-MM-dd") to @Model.CheckOut.ToString("yyyy-MM-dd") · @Model.Guests guest(s)</p>
+
+        <table class="table">
+            <tr><td>R @Model.Property.PricePerNight.ToString("N2") x @Model.Nights night(s)</td><td class="text-end">R @Model.Subtotal.ToString("N2")</td></tr>
+            <tr><td>Cleaning fee</td><td class="text-end">R @Model.CleaningFee.ToString("N2")</td></tr>
+            <tr><td>Service fee</td><td class="text-end">R @Model.ServiceFee.ToString("N2")</td></tr>
+            <tr class="fw-bold"><td>Total</td><td class="text-end">R @Model.Total.ToString("N2")</td></tr>
+        </table>
+
+        <form asp-action="Create" method="post">
+            <input type="hidden" name="propertyId" value="@Model.Property.Id" />
+            <input type="hidden" name="checkIn" value="@Model.CheckIn.ToString("yyyy-MM-dd")" />
+            <input type="hidden" name="checkOut" value="@Model.CheckOut.ToString("yyyy-MM-dd")" />
+            <input type="hidden" name="guests" value="@Model.Guests" />
+            <button type="submit" class="btn btn-danger">Request to book</button>
+            <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.Property.Id" class="btn btn-outline-secondary">Back</a>
+        </form>
+    </div>
+</div>

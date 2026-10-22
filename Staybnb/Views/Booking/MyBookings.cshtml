@@ -1,0 +1,34 @@
+﻿@model List<Staybnb.Models.Booking>
+@{
+    ViewData["Title"] = "My Bookings";
+}
+
+<h1>My Bookings</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (!Model.Any())
+{
+    <p>You have no bookings yet. <a asp-controller="Properties" asp-action="Index">Browse properties</a>.</p>
+}
+else
+{
+    <table class="table align-middle">
+        <thead><tr><th>Property</th><th>Dates</th><th>Guests</th><th>Total</th><th>Status</th></tr></thead>
+        <tbody>
+            @foreach (var b in Model)
+            {
+                <tr>
+                    <td>@b.Property.Title<br /><small class="text-muted">@b.Property.City</small></td>
+                    <td>@b.CheckInDate.ToString("yyyy-MM-dd") to @b.CheckOutDate.ToString("yyyy-MM-dd")</td>
+                    <td>@b.NumberOfGuests</td>
+                    <td>R @b.TotalPrice.ToString("N2")</td>
+                    <td>@b.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

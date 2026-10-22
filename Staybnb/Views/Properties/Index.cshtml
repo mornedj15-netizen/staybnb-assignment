@@ -1,0 +1,64 @@
+﻿@model List<Staybnb.Models.HostProperty>
+@{
+    ViewData["Title"] = "Find your next stay";
+}
+
+<h1 class="mb-3">Relax. Unwind. Choose your next stay.</h1>
+
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-3">
+        <select name="city" class="form-select">
+            <option value="">All cities</option>
+            @foreach (var c in (List<string>)ViewBag.Cities)
+            {
+                <option value="@c" selected="@((string?)ViewBag.City == c)">@c</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="type" class="form-select">
+            <option value="">All property types</option>
+            @foreach (var t in (List<string>)ViewBag.Types)
+            {
+                <option value="@t" selected="@((string?)ViewBag.Type == t)">@t</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto"><button type="submit" class="btn btn-primary">Filter</button></div>
+    <div class="col-auto"><a asp-action="Index" class="btn btn-outline-secondary">Clear</a></div>
+</form>
+
+@if (!Model.Any())
+{
+    <p>No properties match your search.</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var p in Model)
+        {
+            var cover = p.Images.FirstOrDefault()?.ImageUrl;
+            var rating = p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : 0;
+            <div class="col">
+                <a asp-action="Details" asp-route-id="@p.Id" class="text-decoration-none text-dark">
+                    <div class="card h-100 border-0">
+                        @if (cover != null)
+                        {
+                            <img src="@cover" class="card-img-top" alt="@p.Title" style="height:200px;object-fit:cover;border-radius:12px;" />
+                        }
+                        else
+                        {
+                            <div class="bg-secondary-subtle" style="height:200px;border-radius:12px;"></div>
+                        }
+                        <div class="card-body px-0">
+                            <div class="small text-muted">@p.City · @p.PropertyType</div>
+                            <div class="fw-semibold">@p.Title</div>
+                            <div>R @p.PricePerNight.ToString("N0") <span class="text-muted">per night</span></div>
+                            <div class="small">★ @rating.ToString("0.0") (@p.Reviews.Count)</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}

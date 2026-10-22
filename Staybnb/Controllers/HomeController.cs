@@ -13,7 +13,7 @@ namespace Staybnb.Controllers
 
             // if (User.IsInRole("Host")) return RedirectToAction("Dashboard", "Host");   // Phase 8
 
-            return View();
+            return RedirectToAction("Index", "Properties");
         }
 
         public IActionResult Privacy()
