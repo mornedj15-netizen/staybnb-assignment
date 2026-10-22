@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Host Dashboard";
+}
+
+<h1>Host Dashboard</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card p-3"><div class="text-muted">Total properties</div><h2>@ViewBag.TotalProperties</h2><small>@ViewBag.ActiveProperties active</small></div></div>
+    <div class="col-md-3"><div class="card p-3"><div class="text-muted">Total bookings</div><h2>@ViewBag.TotalBookings</h2><small>@ViewBag.PendingBookings pending</small></div></div>
+    <div class="col-md-3"><div class="card p-3"><div class="text-muted">Total earnings</div><h2>R @(((decimal)ViewBag.Earnings).ToString("N2"))</h2></div></div>
+    <div class="col-md-3"><div class="card p-3"><div class="text-muted">Average rating</div><h2>@(((double)ViewBag.AverageRating).ToString("0.0"))</h2><small>@ViewBag.ReviewCount reviews</small></div></div>
+</div>
+
+<a asp-action="Bookings" class="btn btn-primary">View booking requests</a>
+<a asp-action="Properties" class="btn btn-outline-secondary">My properties</a>

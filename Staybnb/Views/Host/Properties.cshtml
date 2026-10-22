@@ -1,0 +1,49 @@
+﻿@model List<Staybnb.Models.HostProperty>
+@{
+    ViewData["Title"] = "My Properties";
+}
+
+<h1>My Properties</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <p>You have no properties yet.</p>
+}
+else
+{
+    <table class="table align-middle">
+        <thead><tr><th></th><th>Property</th><th>City</th><th>Price</th><th>Bookings</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                var cover = p.Images.FirstOrDefault()?.ImageUrl;
+                <tr>
+                    <td>@if (cover != null) {
+                        <img src="@cover" alt="" style="height:50px;width:70px;object-fit:cover;border-radius:4px;" />
+                    }
+                </td>
+                <td>@p.Title</td>
+                <td>@p.City</td>
+                <td>R @p.PricePerNight.ToString("N2")</td>
+                <td>@p.Bookings.Count</td>
+                <td>@(p.IsActive ? "Active" : "Inactive")</td>
+                <td class="d-flex gap-2">
+                    <a asp-action="CheckInProcess" asp-route-propertyId="@p.Id" class="btn btn-outline-secondary btn-sm">Check-in setup</a>
+                    <form asp-action="ToggleActive" asp-route-id="@p.Id" method="post">
+                        <button type="submit" class="btn @(p.IsActive ? "btn-danger" : "btn-success") btn-sm">@(p.IsActive ? "Deactivate" : "Activate")</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+}

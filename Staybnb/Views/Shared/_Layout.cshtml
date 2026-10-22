@@ -44,6 +44,18 @@
                                 <a class="nav-link text-dark" asp-controller="Admin" asp-action="ActivityLogs">Activity Logs</a>
                             </li>
                         }
+                        @if (User.IsInRole("Host"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Host" asp-action="Dashboard">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Host" asp-action="Properties">My Properties</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Host" asp-action="Bookings">Booking Requests</a>
+                            </li>
+                        }
                         @if (User.IsInRole("SuperAdmin"))
                         {
                             <li class="nav-item">

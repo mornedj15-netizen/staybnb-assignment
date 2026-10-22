@@ -1,0 +1,40 @@
+﻿@model Staybnb.ViewModels.CheckInConfigViewModel
+@{
+    ViewData["Title"] = "Check-in setup";
+}
+
+<h1>Check-in setup</h1>
+<p class="text-muted">@Model.PropertyTitle</p>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="CheckInProcess" method="post">
+            <input type="hidden" asp-for="PropertyId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Rules" class="form-label"></label>
+                <textarea asp-for="Rules" class="form-control" rows="5"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Documents" class="form-label"></label>
+                <textarea asp-for="Documents" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Documents" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-action="Properties" class="btn btn-outline-secondary">Back</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
