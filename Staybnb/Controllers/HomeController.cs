@@ -11,7 +11,8 @@ namespace Staybnb.Controllers
             if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
                 return RedirectToAction("Dashboard", "Admin");
 
-            // if (User.IsInRole("Host")) return RedirectToAction("Dashboard", "Host");   // Phase 8
+            if (User.IsInRole("Host"))
+                return RedirectToAction("Dashboard", "Host");
 
             return RedirectToAction("Index", "Properties");
         }

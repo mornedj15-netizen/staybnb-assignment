@@ -1,0 +1,35 @@
+﻿@model List<Staybnb.Models.GuestCheckIn>
+@{
+    ViewData["Title"] = "Guest Check-ins";
+}
+
+<h1>Guest Check-ins</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (!Model.Any())
+{
+    <p>No guests have submitted check-in documents yet.</p>
+}
+else
+{
+    <table class="table align-middle">
+        <thead><tr><th>Guest</th><th>Property</th><th>Dates</th><th>Documents</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.Booking.Guest.FirstName @c.Booking.Guest.LastName</td>
+                    <td>@c.Booking.Property.Title</td>
+                    <td>@c.Booking.CheckInDate.ToString("yyyy-MM-dd") to @c.Booking.CheckOutDate.ToString("yyyy-MM-dd")</td>
+                    <td>@c.Documents.Count</td>
+                    <td>@c.Status</td>
+                    <td><a asp-action="CheckInDetails" asp-route-id="@c.Id" class="btn btn-outline-primary btn-sm">Review</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

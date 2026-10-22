@@ -91,17 +91,6 @@ public class HostController : Controller
         return RedirectToAction(nameof(Properties));
     }
 
-    public IActionResult Index()
-    {
-        if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
-            return RedirectToAction("Dashboard", "Admin");
-
-        if (User.IsInRole("Host"))
-            return RedirectToAction("Dashboard", "Host");
-
-        return RedirectToAction("Index", "Properties");
-    }
-
     // ---------- Booking requests ----------
     public async Task<IActionResult> Bookings()
     {
@@ -253,6 +242,92 @@ public class HostController : Controller
         TempData["Success"] = "Check-in process saved.";
         return RedirectToAction(nameof(Properties));
     }
+
+    // ---------- Guest check-in verification ----------
+    public async Task<IActionResult> CheckIns()
+    {
+        var list = await _db.GuestCheckIns
+            .Include(c => c.Booking).ThenInclude(b => b.Guest)
+            .Include(c => c.Booking).ThenInclude(b => b.Property)
+            .Include(c => c.Documents)
+            .Where(c => c.Booking.Property.HostId == HostId && c.Status >= CheckInStatus.Submitted)
+            .OrderBy(c => c.Status)
+            .ThenByDescending(c => c.CreatedAt)
+            .ToListAsync();
+        return View(list);
+    }
+
+    public async Task<IActionResult> CheckInDetails(int id)
+    {
+        var checkIn = await _db.GuestCheckIns
+            .Include(c => c.Booking).ThenInclude(b => b.Guest)
+            .Include(c => c.Booking).ThenInclude(b => b.Property)
+            .Include(c => c.Documents)
+            .FirstOrDefaultAsync(c => c.Id == id && c.Booking.Property.HostId == HostId);
+        if (checkIn == null) return NotFound();
+        return View(checkIn);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> VerifyDocument(int id)
+    {
+        var doc = await LoadDocumentAsync(id);
+        if (doc == null) return NotFound();
+
+        var checkIn = doc.GuestCheckIn;
+        doc.Status = DocumentStatus.Verified;
+
+        // All required documents verified -> guest is checked in
+        var required = JsonSerializer.Deserialize<CheckInSteps>(checkIn.CheckInProcess.StepsJson)?.Documents ?? new();
+        var allVerified = required.All(t =>
+            checkIn.Documents.Any(d => d.DocumentType == t && d.Status == DocumentStatus.Verified));
+
+        if (allVerified)
+        {
+            checkIn.Status = CheckInStatus.Verified;
+            checkIn.Booking.Status = BookingStatus.CheckedIn;
+        }
+        await _db.SaveChangesAsync();
+
+        await _activityLogger.LogAsync(HostId, $"Verified '{doc.DocumentType}' for booking #{checkIn.BookingId}", ActivityType.BookingUpdate);
+        if (allVerified)
+        {
+            await _activityLogger.LogAsync(HostId, $"Booking #{checkIn.BookingId} checked in", ActivityType.BookingUpdate);
+            await _notifications.NotifyAsync(checkIn.Booking.GuestId, "Check-in Complete",
+                $"Your documents for '{checkIn.Booking.Property.Title}' were verified. You are checked in.",
+                NotificationType.General);
+        }
+
+        TempData["Success"] = allVerified ? "All documents verified. Guest is checked in." : "Document verified.";
+        return RedirectToAction(nameof(CheckInDetails), new { id = checkIn.Id });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RejectDocument(int id)
+    {
+        var doc = await LoadDocumentAsync(id);
+        if (doc == null) return NotFound();
+
+        var checkIn = doc.GuestCheckIn;
+        doc.Status = DocumentStatus.Rejected;
+        checkIn.Status = CheckInStatus.Rejected;
+        await _db.SaveChangesAsync();
+
+        await _activityLogger.LogAsync(HostId, $"Rejected '{doc.DocumentType}' for booking #{checkIn.BookingId}", ActivityType.BookingUpdate);
+        await _notifications.NotifyAsync(checkIn.Booking.GuestId, "Document Rejected",
+            $"Your '{doc.DocumentType}' for '{checkIn.Booking.Property.Title}' was rejected. Please upload a clearer copy.",
+            NotificationType.General);
+
+        TempData["Success"] = "Document rejected. The guest was asked to re-upload.";
+        return RedirectToAction(nameof(CheckInDetails), new { id = checkIn.Id });
+    }
+
+    private Task<GuestDocument?> LoadDocumentAsync(int id) =>
+        _db.GuestDocuments
+            .Include(d => d.GuestCheckIn).ThenInclude(c => c.Booking).ThenInclude(b => b.Property)
+            .Include(d => d.GuestCheckIn).ThenInclude(c => c.CheckInProcess)
+            .Include(d => d.GuestCheckIn).ThenInclude(c => c.Documents)
+            .FirstOrDefaultAsync(d => d.Id == id && d.GuestCheckIn.Booking.Property.HostId == HostId);
 
     private static List<string> Lines(string? text) =>
         (text ?? "").Split('\n').Select(l => l.Trim()).Where(l => l.Length > 0).ToList();

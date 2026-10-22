@@ -1,0 +1,44 @@
+﻿@model Staybnb.Models.GuestCheckIn
+@using Staybnb.Models
+@{
+    ViewData["Title"] = "Check-in details";
+}
+
+<h1>Check-in details</h1>
+<p>
+    @Model.Booking.Guest.FirstName @Model.Booking.Guest.LastName · @Model.Booking.Property.Title ·
+    @Model.Booking.CheckInDate.ToString("yyyy-MM-dd") to @Model.Booking.CheckOutDate.ToString("yyyy-MM-dd")
+</p>
+<p>Check-in status: <strong>@Model.Status</strong> · Booking status: <strong>@Model.Booking.Status</strong></p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<table class="table align-middle">
+    <thead><tr><th>Document</th><th>File</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+        @foreach (var d in Model.Documents)
+        {
+            <tr>
+                <td>@d.DocumentType</td>
+                <td><a asp-controller="Document" asp-action="Download" asp-route-id="@d.Id" target="_blank">Open</a></td>
+                <td>@d.Status</td>
+                <td>
+                    @if (d.Status == DocumentStatus.Pending && Model.Status == CheckInStatus.Submitted)
+                    {
+                        <form asp-action="VerifyDocument" asp-route-id="@d.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-success btn-sm">Verify</button>
+                        </form>
+                        <form asp-action="RejectDocument" asp-route-id="@d.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="CheckIns">Back to check-ins</a>

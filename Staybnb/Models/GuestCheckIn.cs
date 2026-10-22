@@ -1,4 +1,6 @@
-﻿using Staybnb.Models;
+﻿namespace Staybnb.Models;
+
+using Staybnb.Models;
 
 public class GuestCheckIn
 {

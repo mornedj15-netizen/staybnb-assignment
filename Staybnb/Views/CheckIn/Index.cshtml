@@ -1,0 +1,122 @@
+﻿@model Staybnb.ViewModels.CheckInViewModel
+@using Staybnb.Models
+@{
+    ViewData["Title"] = "Check-in";
+    var ci = Model.CheckIn;
+    bool locked = ci.Status == CheckInStatus.Submitted || ci.Status == CheckInStatus.Verified;
+    bool missing = Model.RequiredDocuments.Any(t => !ci.Documents.Any(d => d.DocumentType == t));
+}
+
+<h1>Check-in: @Model.Booking.Property.Title</h1>
+<p class="text-muted">@Model.Booking.CheckInDate.ToString("yyyy-MM-dd") to @Model.Booking.CheckOutDate.ToString("yyyy-MM-dd")</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (ci.Status == CheckInStatus.Submitted)
+{
+    <div class="alert alert-info">Submitted. Waiting for the host to verify your documents.</div>
+}
+else if (ci.Status == CheckInStatus.Verified)
+{
+    <div class="alert alert-success">Your documents are verified. You are checked in.</div>
+}
+else if (ci.Status == CheckInStatus.Rejected)
+{
+    <div class="alert alert-warning">A document was rejected. Please upload a replacement and submit again.</div>
+}
+
+<ul class="nav nav-pills mb-4">
+    <li class="nav-item"><a class="nav-link @(Model.Step == 1 ? "active" : "")" asp-action="Index" asp-route-bookingId="@Model.Booking.Id" asp-route-step="1">1. House rules</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.Step == 2 ? "active" : "")" asp-action="Index" asp-route-bookingId="@Model.Booking.Id" asp-route-step="2">2. Documents</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.Step == 3 ? "active" : "")" asp-action="Index" asp-route-bookingId="@Model.Booking.Id" asp-route-step="3">3. Submit</a></li>
+</ul>
+
+@if (Model.Step == 1)
+{
+    <h4>House rules</h4>
+    @if (!Model.Rules.Any())
+    {
+        <p class="text-muted">The host has not listed any rules.</p>
+    }
+    else
+    {
+        <ul>@foreach (var r in Model.Rules) {
+            <li>@r</li>
+        }
+    </ul>
+}
+
+<form asp-action="AcknowledgeRules" method="post">
+    <input type="hidden" name="bookingId" value="@Model.Booking.Id" />
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="agree" required />
+        <label class="form-check-label" for="agree">I have read and agree to the house rules.</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Continue</button>
+</form>
+}
+else if (Model.Step == 2)
+{
+    <h4>Required documents</h4>
+    <p class="text-muted">Accepted formats: JPG, PNG or PDF, up to 5 MB.</p>
+
+    @foreach (var type in Model.RequiredDocuments)
+    {
+        var doc = ci.Documents.FirstOrDefault(d => d.DocumentType == type);
+        <div class="card p-3 mb-3">
+            <div class="d-flex justify-content-between">
+                <strong>@type</strong>
+                <span>@(doc == null ? "Not uploaded" : doc.Status.ToString())</span>
+            </div>
+
+            @if (doc != null)
+            {
+                <div class="mb-2"><a asp-controller="Document" asp-action="Download" asp-route-id="@doc.Id" target="_blank">View uploaded file</a></div>
+            }
+
+            @if (!locked && (doc == null || doc.Status != DocumentStatus.Verified))
+            {
+                <form asp-action="Upload" method="post" enctype="multipart/form-data" class="d-flex gap-2">
+                    <input type="hidden" name="bookingId" value="@Model.Booking.Id" />
+                    <input type="hidden" name="documentType" value="@type" />
+                    <input type="file" name="file" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required />
+                    <button type="submit" class="btn btn-outline-primary">@(doc == null ? "Upload" : "Replace")</button>
+                </form>
+            }
+        </div>
+    }
+
+    <a asp-action="Index" asp-route-bookingId="@Model.Booking.Id" asp-route-step="3" class="btn btn-primary">Continue</a>
+}
+else
+{
+    <h4>Review and submit</h4>
+    <ul>
+        @foreach (var type in Model.RequiredDocuments)
+        {
+            var doc = ci.Documents.FirstOrDefault(d => d.DocumentType == type);
+            <li>@type: @(doc == null ? "not uploaded" : doc.Status.ToString())</li>
+        }
+    </ul>
+
+    @if (!locked)
+    {
+        <form asp-action="Submit" method="post">
+            <input type="hidden" name="bookingId" value="@Model.Booking.Id" />
+            <button type="submit" class="btn btn-danger" disabled="@missing">Submit check-in</button>
+            @if (missing)
+            {
+                <span class="text-muted ms-2">Upload every document first.</span>
+            }
+        </form>
+    }
+}
+
+<p class="mt-4"><a asp-controller="Booking" asp-action="MyBookings">Back to My Bookings</a></p>
