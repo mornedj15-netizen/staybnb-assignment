@@ -8,10 +8,20 @@ namespace Staybnb.Controllers
     {
         public IActionResult Index()
         {
+            if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+                return RedirectToAction("Dashboard", "Admin");
+
+            // if (User.IsInRole("Host")) return RedirectToAction("Dashboard", "Host");   // Phase 8
+
             return View();
         }
 
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult AccessDenied()
         {
             return View();
         }

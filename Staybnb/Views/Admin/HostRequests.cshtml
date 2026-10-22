@@ -1,0 +1,58 @@
+﻿@model List<Staybnb.Models.HostApplication>
+@{
+    ViewData["Title"] = "Host Requests";
+}
+
+<h1>Host Requests</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <p>No applications yet.</p>
+}
+else
+{
+    <table class="table align-middle">
+        <thead>
+            <tr><th>Applicant</th><th>Property</th><th>City</th><th>Price</th><th>Images</th><th>Applied</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model)
+            {
+                <tr>
+                    <td>@a.ApplicationUser.FirstName @a.ApplicationUser.LastName<br /><small class="text-muted">@a.ApplicationUser.Email</small></td>
+                    <td>@a.Property.Title</td>
+                    <td>@a.Property.City</td>
+                    <td>R @a.Property.PricePerNight.ToString("N2")</td>
+                    <td>
+                        @foreach (var img in a.Property.Images)
+                        {
+                            <img src="@img.ImageUrl" alt="Property image" style="height:50px;width:70px;object-fit:cover;border-radius:4px;" />
+                        }
+                    </td>
+                    <td>@a.AppliedAt.ToString("yyyy-MM-dd")</td>
+                    <td>@a.Status</td>
+                    <td>
+                        @if (a.Status == Staybnb.Models.ApplicationStatus.Pending)
+                        {
+                            <form asp-action="Approve" asp-route-id="@a.Id" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            <form asp-action="Reject" asp-route-id="@a.Id" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

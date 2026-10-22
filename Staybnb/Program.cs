@@ -28,6 +28,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<IActivityLogger, ActivityLogger>();
 
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// Makes role changes take effect on the user's very next request
+builder.Services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.Zero);
+
 var app = builder.Build();
 
 Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, "uploads", "properties"));
