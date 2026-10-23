@@ -21,3 +21,5 @@ ASP.NET Core MVC, EF Core, SQL Server (LocalDB).
 - Payments are simulated: marked Paid when the host approves a booking.
 - Guest documents are stored in `App_Data/guest-documents` and served only to the guest and host.
 
+## Author
+[Morne de Jager 402411727]
