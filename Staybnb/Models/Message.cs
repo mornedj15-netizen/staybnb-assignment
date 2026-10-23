@@ -1,5 +1,7 @@
 ﻿using Staybnb.Models;
 
+namespace Staybnb.Models;
+
 public class Message
 {
     public int Id { get; set; }

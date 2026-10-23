@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Staybnb.Models;
 
+namespace Staybnb.Models;
+
 public class Notification
 {
     public int Id { get; set; }

@@ -68,6 +68,7 @@
                 </div>
                 <button type="submit" class="btn btn-danger w-100">Check price</button>
             </form>
+            <a asp-controller="Messages" asp-action="Conversation" asp-route-userId="@Model.HostId" class="btn btn-outline-secondary w-100 mt-2">Message host</a>
         }
         else if (User.Identity?.IsAuthenticated == true)
         {

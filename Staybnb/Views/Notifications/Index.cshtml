@@ -1,0 +1,46 @@
+﻿@model List<Staybnb.Models.Notification>
+@{
+    ViewData["Title"] = "Notifications";
+    string filter = ViewBag.Filter;
+    int? selectedId = ViewBag.SelectedId;
+}
+
+<h1>Notifications</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <ul class="nav nav-pills">
+        <li class="nav-item"><a class="nav-link @(filter == "all" ? "active" : "")" asp-action="Index" asp-route-filter="all">All (@ViewBag.AllCount)</a></li>
+        <li class="nav-item"><a class="nav-link @(filter == "unread" ? "active" : "")" asp-action="Index" asp-route-filter="unread">Unread (@ViewBag.UnreadCount)</a></li>
+        <li class="nav-item"><a class="nav-link @(filter == "read" ? "active" : "")" asp-action="Index" asp-route-filter="read">Read (@ViewBag.ReadCount)</a></li>
+    </ul>
+    <form asp-action="MarkAllRead" method="post">
+        <button type="submit" class="btn btn-outline-secondary btn-sm">Mark all as read</button>
+    </form>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">Nothing here.</p>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var n in Model)
+        {
+            <div class="list-group-item @(n.Id == selectedId ? "border-primary" : "")">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <a asp-action="Index" asp-route-filter="@filter" asp-route-selectedId="@n.Id" class="text-decoration-none text-dark @(n.IsRead ? "" : "fw-bold")">
+                            @(n.IsRead ? "" : "● ")@n.Title
+                        </a>
+                        <div class="text-muted">@n.Message</div>
+                        <small class="text-muted">@n.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC · @n.Type · @(n.IsRead ? "Read" : "Unread")</small>
+                    </div>
+                    <form asp-action="Delete" asp-route-id="@n.Id" method="post">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+}

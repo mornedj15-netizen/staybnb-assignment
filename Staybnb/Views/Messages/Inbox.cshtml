@@ -1,0 +1,30 @@
+﻿@model List<Staybnb.ViewModels.ConversationSummary>
+@{
+    ViewData["Title"] = "Messages";
+}
+
+<h1>Messages</h1>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No messages yet. Open a property and click <strong>Message host</strong> to start a conversation.</p>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var c in Model)
+        {
+            <a asp-action="Conversation" asp-route-userId="@c.OtherUserId" class="list-group-item list-group-item-action">
+                <div class="d-flex justify-content-between">
+                    <span class="@(c.UnreadCount > 0 ? "fw-bold" : "")">@c.OtherName</span>
+                    <small class="text-muted">@c.LastTimestamp.ToString("yyyy-MM-dd HH:mm")</small>
+                </div>
+                <div class="text-muted text-truncate">@c.LastMessage</div>
+                @if (c.UnreadCount > 0)
+                {
+                    <span class="badge bg-danger">@c.UnreadCount new</span>
+                }
+            </a>
+        }
+    </div>
+}

@@ -1,0 +1,35 @@
+﻿@model List<Staybnb.Models.Message>
+@{
+    ViewData["Title"] = "Conversation";
+}
+
+<h1>@ViewBag.OtherName</h1>
+<p><a asp-action="Inbox">Back to inbox</a></p>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="mb-3" style="max-width:700px;">
+    @if (!Model.Any())
+    {
+        <p class="text-muted">No messages yet. Say hello below.</p>
+    }
+    @foreach (var m in Model)
+    {
+        var mine = m.SenderId == (string)ViewBag.Me;
+        <div class="d-flex @(mine ? "justify-content-end" : "justify-content-start") mb-2">
+            <div class="p-2 rounded @(mine ? "bg-primary text-white" : "bg-light")" style="max-width:75%;">
+                <div>@m.Content</div>
+                <small class="@(mine ? "text-white-50" : "text-muted")">@m.Timestamp.ToString("yyyy-MM-dd HH:mm")</small>
+            </div>
+        </div>
+    }
+</div>
+
+<form asp-action="Send" method="post" style="max-width:700px;">
+    <input type="hidden" name="receiverId" value="@ViewBag.OtherId" />
+    <div class="mb-2"><textarea name="content" class="form-control" rows="3" maxlength="2000" placeholder="Write a message..." required></textarea></div>
+    <button type="submit" class="btn btn-primary">Send</button>
+</form>

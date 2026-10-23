@@ -1,0 +1,38 @@
+﻿@model Staybnb.ViewModels.NotificationBellViewModel
+
+<ul class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-controller="Messages" asp-action="Inbox">
+            Messages
+            @if (Model.UnreadMessages > 0)
+            {
+                <span class="badge rounded-pill bg-danger">@Model.UnreadMessages</span>
+            }
+        </a>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            🔔
+            @if (Model.UnreadNotifications > 0)
+            {
+                <span class="badge rounded-pill bg-danger">@Model.UnreadNotifications</span>
+            }
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" style="min-width:300px;">
+            @if (!Model.Latest.Any())
+            {
+                <li><span class="dropdown-item-text text-muted">No notifications yet.</span></li>
+            }
+            @foreach (var n in Model.Latest)
+            {
+                <li>
+                    <a class="dropdown-item text-wrap @(n.IsRead ? "" : "fw-semibold")" asp-controller="Notifications" asp-action="Index" asp-route-selectedId="@n.Id">
+                        @n.Title<br /><small class="text-muted">@n.CreatedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                    </a>
+                </li>
+            }
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" asp-controller="Notifications" asp-action="Index">View all</a></li>
+        </ul>
+    </li>
+</ul>
