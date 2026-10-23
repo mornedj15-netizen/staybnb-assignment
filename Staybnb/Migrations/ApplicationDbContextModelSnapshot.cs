@@ -48,7 +48,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ActivityLogs");
+                    b.ToTable("ActivityLogs", (string)null);
                 });
 
             modelBuilder.Entity("Amenity", b =>
@@ -71,7 +71,7 @@ namespace Staybnb.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Amenities");
+                    b.ToTable("Amenities", (string)null);
                 });
 
             modelBuilder.Entity("AmenityHostProperty", b =>
@@ -86,7 +86,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("PropertiesId");
 
-                    b.ToTable("AmenityHostProperty");
+                    b.ToTable("AmenityHostProperty", (string)null);
                 });
 
             modelBuilder.Entity("Booking", b =>
@@ -126,7 +126,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("PropertyId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("CheckInProcess", b =>
@@ -157,7 +157,7 @@ namespace Staybnb.Migrations
                     b.HasIndex("PropertyId")
                         .IsUnique();
 
-                    b.ToTable("CheckInProcesses");
+                    b.ToTable("CheckInProcesses", (string)null);
                 });
 
             modelBuilder.Entity("GuestCheckIn", b =>
@@ -187,7 +187,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("CheckInProcessId");
 
-                    b.ToTable("GuestCheckIns");
+                    b.ToTable("GuestCheckIns", (string)null);
                 });
 
             modelBuilder.Entity("GuestDocument", b =>
@@ -218,7 +218,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("GuestCheckInId");
 
-                    b.ToTable("GuestDocuments");
+                    b.ToTable("GuestDocuments", (string)null);
                 });
 
             modelBuilder.Entity("HostApplication", b =>
@@ -248,7 +248,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("PropertyId");
 
-                    b.ToTable("HostApplications");
+                    b.ToTable("HostApplications", (string)null);
                 });
 
             modelBuilder.Entity("Message", b =>
@@ -283,7 +283,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -453,7 +453,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("Payment", b =>
@@ -482,7 +482,7 @@ namespace Staybnb.Migrations
                     b.HasIndex("BookingId")
                         .IsUnique();
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("PropertyImage", b =>
@@ -504,7 +504,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("PropertyId");
 
-                    b.ToTable("PropertyImages");
+                    b.ToTable("PropertyImages", (string)null);
                 });
 
             modelBuilder.Entity("Review", b =>
@@ -539,7 +539,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("ReviewerId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("Staybnb.Models.ApplicationUser", b =>
@@ -672,7 +672,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("HostId");
 
-                    b.ToTable("Properties");
+                    b.ToTable("Properties", (string)null);
                 });
 
             modelBuilder.Entity("WishlistItem", b =>
@@ -699,7 +699,7 @@ namespace Staybnb.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("WishlistItems");
+                    b.ToTable("WishlistItems", (string)null);
                 });
 
             modelBuilder.Entity("ActivityLog", b =>

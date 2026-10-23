@@ -40,7 +40,10 @@ Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, "uploads", "
 // Seed roles + SuperAdmin on startup (Phase 4)
 using (var scope = app.Services.CreateScope())
 {
-    await RoleSeeder.SeedAsync(scope.ServiceProvider);
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();                                // creates/updates the database
+    await RoleSeeder.SeedAsync(scope.ServiceProvider);              // roles + SuperAdmin
+    await DemoDataSeeder.SeedAsync(scope.ServiceProvider);          // amenities, demo users, sample listings
 }
 
 app.UseHttpsRedirection();
