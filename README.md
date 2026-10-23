@@ -20,3 +20,4 @@ ASP.NET Core MVC, EF Core, SQL Server (LocalDB).
 - Total price = (price per night x nights) + cleaning fee + service fee (12% of the nightly subtotal).
 - Payments are simulated: marked Paid when the host approves a booking.
 - Guest documents are stored in `App_Data/guest-documents` and served only to the guest and host.
+
